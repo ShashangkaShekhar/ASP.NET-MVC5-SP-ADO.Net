@@ -1,0 +1,64 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+
+<!-- list -->
+<div id="resultCust"></div>
+<div id="loader" style="text-align: center; display: none; margin-bottom: 20px;">
+    <img alt="Loading" src="@Url.Content("~/Content/loader.gif")" /> Loading...
+</div>
+<!-- list -->
+
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script type="text/javascript">
+
+    var inProgress = false;
+    $(document).ready(function () {
+
+        //======================Default Load================//
+        inProgress = true;
+        $("#loader").show();
+        $.get("@Url.Action("GetCustomer", "Customer")", { "RowCountPerPage": 5 },
+                   function (data) {
+                       $("#resultCust").append(data);
+                       $("#loader").hide();
+                       inProgress = false;
+                   });
+
+        //======================UL SCroll Load================//
+        var page = 1;
+        var _inCallback = false;
+
+        $(window).scroll(function () {
+
+            if ($(window).scrollTop() == $(document).height() - $(window).height()) {
+                if (page > -1 && !_inCallback) {
+                    _inCallback = true;
+                    page++;
+                    $("#loader").show();
+                    $.get("@Url.Action("GetCustomer_Scroll", "Customer")", { "PageNo": page, "RowCountPerPage": 5 },
+                     function (data) {
+                         if (data != '') {
+                             $("#resultCust").append(data);
+                         }
+                         else {
+                             page = -1;
+                         }
+                         $("#loader").hide();
+                         _inCallback = false;
+                     });
+                }
+            }
+        });
+    });
+
+</script>
+
+
+
